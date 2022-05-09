@@ -2,6 +2,8 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #include <wait.h>
 #include <stdio.h>
@@ -11,6 +13,7 @@
 #include <sys/inotify.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <errno.h>
 #include "queue.h"
 
 
@@ -88,51 +91,75 @@ int main(void){
 
         // creating as many workers as the existing files in directory
         int id2 = getppid();
-        printf("id2 = %d\n", id2);
         Queue *Q;
         queue_init(&Q);
-        for(int j=1 ; j<i ; j++){
+        for(int j=0 ; j<i ; j++){
             if(id2 > 0) {
-                printf("trying to create worker\n");
                 id2 = fork();
-                if(id2 = -1) {
+                if(id2 == -1) {
                     printf("process: %d creation of worker failed\n", getpid());
-                    return 5;
-                } else {
-                    printf("worker created\n");
+                    exit(EXIT_FAILURE);
                 }
-
-                // // creating name pipe(fifo) for the new child
-                // char *fifo = fifoname(j+1);
-                // mkfifo(fifo, 0666);
-                // if (id2 > 0){
-                //     // manager will wait for the child's id to put it inside the queue
-                //     // alongside the name of the named pipe for that process
-                //     printf("manager\n");
-
-                //     int fifofd = open(fifo, O_RDONLY);
-                //     if (fifofd == -1) printf("opening fifo not succesfull\n");
-                //     printf("lala\n");
-                //     int childid;
-                //     read(fifofd, &childid, sizeof(int));
-                //     printf("after read %s\n", fifo);
-                //     close(fifofd);
-                //     queue_push(&Q, childid, fifo);
-
-                // } else if(id2 = 0) {
-                //     // child process will get its id write it to the named pipe just created for it
-                //     printf("worker\n");
-
-                //     int tempid = getpid();
-                //     int fifofd = open(fifo, O_WRONLY);
-                //     if (fifofd == -1) printf("opening fifo not succesfull\n");
-                //     write(fifofd, &tempid, sizeof(int));
-                //     printf("after write %d\n", tempid);
-                //     close(fifofd);
-
-                // }
             }
         }
+
+        // creating name pipe(fifo) for the new child
+        int j, fifoid;
+        for(j=1 ; j<i ; j++){
+            char *fifo = fifoname(j+1);
+            mkfifo(fifo, 0777);
+            if(id2 == 0) {
+                // child process will get its id write it to the named pipe just created for it
+
+                int tempid = getpid();
+                printf("worker %d\n", tempid);
+                int fifofd = open(fifo, O_WRONLY);
+                if (fifofd == -1) printf("opening fifo not succesfull\n");
+                write(fifofd, &tempid, sizeof(int));
+                close(fifofd);
+                break; // only need this one time for each child
+
+            } else if(id2 > 0) {
+                // manager will wait for the child's id to put it inside the queue
+                // alongside the name of the named pipe for that process
+
+                int fifofd = open(fifo, O_RDONLY);
+                if (fifofd == -1) printf("opening fifo not succesfull\n");
+                int childid;
+                read(fifofd, &childid, sizeof(int));
+                close(fifofd);
+                printf("manager %s %d\n", fifo, childid);
+                queue_push(&Q, childid, fifo);
+
+            }
+        }
+        if (id2 > 0){
+            printf("%s\n", queue_pop(&Q).fifoname);
+        }
+
+        // if(id2 > 0) {
+        //     for(j=1 ; j<i ; j++) {
+        //         char *fifo = fifoname(j+1);
+        //         mkfifo(fifo, 0777);
+        //         int fifofd = open(fifo, O_RDONLY);
+        //         if (fifofd == -1) printf("opening fifo not succesfull\n");
+        //         int childid;
+        //         read(fifofd, &childid, sizeof(int));
+        //         printf("after read %s\n", fifo);
+        //         close(fifofd);
+        //         queue_push(&Q, childid, fifo);
+        //     }
+        // } else if(id2 == 0) {
+        //         // child process will get its id write it to the named pipe just created for it
+        //         printf("worker\n");
+
+        //         int tempid = getpid();
+        //         int fifofd = open(fifo, O_WRONLY);
+        //         if (fifofd == -1) printf("opening fifo not succesfull\n");
+        //         write(fifofd, &tempid, sizeof(int));
+        //         printf("after write %d\n", tempid);
+        //         close(fifofd);
+        // }
 
 
         // waiting for a change in dir from listener
@@ -163,6 +190,7 @@ int main(void){
 
     } else {
         //listener
+        printf("listener id = %d\n", getpid());
         
         
         close(fd[0]);

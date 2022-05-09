@@ -1,31 +1,47 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <unistd.h>
+#include <wait.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "queue.h"
+#include <string.h>
+#include <errno.h>
+#include <sys/inotify.h>
+#include <ctype.h>
+#include <fcntl.h>
+#include <errno.h>
 
 int main(void){
-    int i;
-    char *str1 = "la", *str2 = "lala", *str3 = "lalala", *str4 = "lalalala";
-    Queue *Q;
-    queue_init(&Q);
-    queue_push(&Q, 1, str1);
-    queue_push(&Q, 2, str2);
-    Queue temp = queue_pop(&Q);
-    print_node(temp);
-    temp = queue_pop(&Q);
-    print_node(temp);
-    if(queue_isempty(Q)){
-        printf("empty\n");
-    } else {
-        printf("not emtpy\n");
+
+    int id=1, fd;
+
+    mkfifo("myfifo", 0777);
+
+    for (int i=0 ; i<5 ; i++){
+        if(id > 0) {
+            id = fork();
+        }
     }
-    queue_push(&Q, 3, str3);
-    if(queue_isempty(Q)){
-        printf("empty\n");
+    if(id == 0) {
+        printf("1\n");
+        fd = open("myfifo", O_WRONLY);
+        printf("2\n");
+        char *str = "fifo test succesfull!";
+        printf("3\n");
+        write(fd, str, 20*sizeof(char));
+        printf("4\n");
     } else {
-        printf("not emtpy\n");
+        fd = open("myfifo", O_RDONLY);
+        printf("5\n");
+        char *s;
+        s = (char*) malloc(20*sizeof(char));
+        read(fd, s, 20*sizeof(char));
+        printf("6\n");
+        printf("%s\n", s);
+        printf("7\n");
     }
-    temp = queue_pop(&Q);
-    print_node(temp);
 
     return 0;
 }
