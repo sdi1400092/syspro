@@ -106,6 +106,9 @@ int main(void){
 
         close(fd[1]);
 
+        Queue *Q;
+        queue_init(&Q);
+
         //getting number of existing files in directory
         char *la[] = {">>", "lala.txt", NULL};
         system("ls kaka | wc -w > wcout.txt");
@@ -148,11 +151,7 @@ int main(void){
         int childid;
         if(id2 > 0) {
 
-            // still the manager
-            
-            Queue *Q;
-            queue_init(&Q);
-            
+            // still the manager            
             int j;
             for(j=0 ; j<i ; j++){
                 char *fifo = fifoname(j+1);
@@ -178,16 +177,18 @@ int main(void){
             char *str;
             int n = fcntl(fd[0], F_GETPIPE_SZ), id3 = id2;
             buffer = (char *) malloc(n*sizeof(char));
+            FileName = (char *) malloc(sizeof(buffer));
 
             while(1){
 
                 if(read(fd[0], buffer, n) > 0){
+                    
 
-                    FileName = (char *) malloc(sizeof(buffer));
                     FileName = strrchr(buffer, ch);
                     printf("file name to be opened by worker--->%s", ++FileName);
-                
-                    // if the Q is empty then create a new worker and push him into the Q
+
+                    // if the Q is empty and we are on the parent process (still the manager)
+                    // then create a new worker and push him into the Q
                     if (queue_isempty(Q) && id3 >0) {
                         // create a new worker since no worker is available to work 
                         
@@ -226,10 +227,28 @@ int main(void){
                     Queue Qitem;
                     Qitem = queue_pop(&Q);
 
+                    printf("going to open fifo %s\n", Qitem.fifoname);
+                    fifofd = open(Qitem.fifoname, O_WRONLY);
+                    if(fifofd == -1) printf("opening fifo failed\n");
+                    write(fifofd, FileName, sizeof(FileName));
+                    close(fifofd);
+
                     // check if the worker we poped from the list is the process we are currently on
                     if (Qitem.processid = getpid()){
                         // search open the FileName and find Links...
-                        
+                        char *file;
+                        file = (char *) malloc(n*sizeof(char));
+                        printf("worker reporting for duty\n");
+
+                        fifofd = open(Qitem.fifoname, O_RDONLY);
+                        if(fifofd == -1) printf("opening fifo failed\n");
+                        read(fifofd, file, n*sizeof(char));
+                        close(fifofd);
+
+                        printf("done with the fifo\n");
+                        int filefd = open(file, O_RDONLY);
+                        if(filefd == -1) printf("opening file failed\n");
+                        printf("done with opening file\n");
                     }
                 }
 
@@ -243,7 +262,6 @@ int main(void){
 
     } else {
         //listener
-        printf("listener id = %d\n", getpid());
         
         
         close(fd[0]);

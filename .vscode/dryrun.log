@@ -1,5 +1,6 @@
 make --dry-run --keep-going --print-directory
 make: Entering directory '/home/antonis/Desktop/syspro1'
-make: 'sniffer' is up to date.
+rm fifo*
+gcc -o sniffer sniffer.o queueimplementation.o
 make: Leaving directory '/home/antonis/Desktop/syspro1'
  

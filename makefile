@@ -1,5 +1,5 @@
 
-sniffer: sniffer.o queueimplementation.o
+sniffer: sniffer.o queueimplementation.o clean
 	gcc -o sniffer sniffer.o queueimplementation.o
 
 sniffer.o: sniffer.c queue.h
@@ -8,3 +8,5 @@ sniffer.o: sniffer.c queue.h
 queueimplementation.o: queue.h
 	gcc -c queueimplementation.c
 
+clean:
+	rm fifo*
