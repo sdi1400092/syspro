@@ -1,0 +1,5 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory '/home/antonis/Desktop/syspro1'
+make: 'sniffer' is up to date.
+make: Leaving directory '/home/antonis/Desktop/syspro1'
+ 

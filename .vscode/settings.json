@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "unistd.h": "c",
-        "queueimplementation.c": "c"
+        "queueimplementation.c": "c",
+        "stdio.h": "c",
+        "types.h": "c"
     }
 }
