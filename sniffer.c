@@ -32,8 +32,6 @@ char *fifoname(int i){
     int len = strlen(s);
 
     char *str = malloc(len + i/10 + 2);
-
-    str = realloc(str, len + i/10 + 2);
     
     if(i/10 == 0){
         // for i with 1 digit
@@ -58,6 +56,38 @@ char *fifoname(int i){
         str[len+1] = (i%100)/10 + '0';
         str[len+2] = i%10 + '0';
         str[len+3] = '\0';
+    
+    }
+    
+    return str;
+
+}
+
+// a function turning an int into a character (works for up to number: 999)
+char *chartoint(int i) {
+
+    char *str = malloc(i/10 + 2);
+    
+    if(i/10 == 0){
+        // for i with 1 digit
+        
+        str[0] = i + '0';
+        str[1] = '\0';
+
+    } else if (i/10 < 10){
+        // for i with 2 digits
+        
+        str[0] = i/10 + '0';
+        str[1] = i%10 + '0';
+        str[2] = '\0';
+    
+    } else if (i/10 < 100){
+        // for numbers with three digits
+
+        str[0] = i/100 + '0';
+        str[1] = (i%100)/10 + '0';
+        str[2] = i%10 + '0';
+        str[3] = '\0';
     
     }
     
@@ -191,28 +221,43 @@ void geturls(char *filename){
         i++;
 	}
 
-    // i = -1;
-	// while(arr[i+1].url != NULL) {
-    //     printf("%s %d\n", arr[i+1].url, arr[i+1].counter);
-    //     i++;
-    // }
-    // if(i == -1) printf("no urls found\n");
-
-
     filename += strlen("./notifyDir/");
+
+    i = 0;
+    while(filename[i] != '\0') {
+        if(filename[i] == '.'){
+            filename[i] = '\0';
+        }
+        i++;
+    }
+
     strcat(filename, ".out");
 
-    fd = open(filename, O_WRONLY | O_CREAT);
+    fd = open(filename, O_RDWR | O_CREAT);
+
+    int len;
+    char *number;
     i = 0;
     while(arr[i].url != NULL) {
-     
-        write(fd, arr[i].url, sizeof(arr[i].url));
+        
+        len = strlen(arr[i].url);
+        write(fd, arr[i].url, len*sizeof(char));
         write(fd, " ", sizeof(char));
-        write(fd, &(arr[i].counter), sizeof(int));
+        number = chartoint(arr[i].counter);
+        len = strlen(number);
+        write(fd, number, len*sizeof(char));
         write(fd, "\n", sizeof(char));
         i++;
 
     }
+
+    char *ar[] = {
+        "chmod",
+        "777",
+        filename,
+        NULL
+    };
+    execvp("chmod", ar);
 
 }
 
