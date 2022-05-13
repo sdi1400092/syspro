@@ -199,7 +199,7 @@ void geturls(char *filename){
     // if(i == -1) printf("no urls found\n");
 
 
-    filename += strlen("./kaka/");
+    filename += strlen("./notifyDir/");
     strcat(filename, ".out");
 
     fd = open(filename, O_WRONLY | O_CREAT);
@@ -211,7 +211,7 @@ void geturls(char *filename){
         write(fd, &(arr[i].counter), sizeof(int));
         write(fd, "\n", sizeof(char));
         i++;
-        
+
     }
 
 }
@@ -311,7 +311,7 @@ int main(void){
                                         // so that when i try to open it, it won't return -1
                                         // char *str;
                                         // str = (char *) malloc(n*sizeof(char));
-                                        strcpy(str, "./kaka/");
+                                        strcpy(str, "./notifyDir/");
                                         strcat(str, file);
                                         int z = 0; 
                                         while(str != "\0"){
@@ -389,7 +389,7 @@ int main(void){
             "create",
             "-e",
             "moved_to",
-            "kaka",
+            "notifyDir",
             NULL
         };
         
