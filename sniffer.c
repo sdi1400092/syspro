@@ -195,14 +195,6 @@ void geturls(char *filename){
 
     filename += strlen("./notifyDir/");
 
-    i = 0;
-    while(filename[i] != '\0') {
-        if(filename[i] == '.'){
-            filename[i] = '\0';
-        }
-        i++;
-    }
-
     strcat(filename, ".out");
 
     fd = open(filename, O_RDWR | O_CREAT);
@@ -261,9 +253,6 @@ int main(void){
         int n = fcntl(fd[0], F_GETPIPE_SZ);
         Qitem.processid = -1;
 
-        // waiting for a change in dir from listener
-        printf("waiting for changes in dir...\n");
-
         char *buffer;
         char *FileName;
         char ch = ' ';
@@ -274,6 +263,7 @@ int main(void){
 
         while(1){
 
+            // waiting for a change in dir from listener
             if(read(fd[0], buffer, n) > 0){
 
                 if(id2 > 0) {
@@ -306,7 +296,9 @@ int main(void){
                         write(fifofd, &tempid, sizeof(int));
                         close(fifofd);
 
+                        kill(getpid(), SIGSTOP);
 
+                        while(1) {
                             // open fifo and check if the id of the process the manager wanted to open
                             // is this one also read the name of the file that has to be opened
                             char *file;
@@ -317,40 +309,37 @@ int main(void){
                             read(fifofd, file, n*sizeof(char));
                             read(fifofd, &(Qitem.processid), sizeof(int));
                             close(fifofd);
-                        
+
+                            // check if the worker we popped from the queue is the process we are currently on                        
+                            // probably unnecessary since wee used a signal via the processid to continue this specific process
                             if(Qitem.processid == getpid()) {
 
                                 char *str;
                                 str = (char *) malloc(n*sizeof(char));
 
-                                // check if the worker we popped from the queue is the process we are currently on
-                                while(1) {
+                                
 
-                                        // add the path of the directory my files are in
-                                        // so that when i try to open it, it won't return -1
-                                        // char *str;
-                                        // str = (char *) malloc(n*sizeof(char));
-                                        strcpy(str, "./notifyDir/");
-                                        strcat(str, file);
-                                        int z = 0; 
-                                        while(str != "\0"){
-                                            if(str[z] != '\n'){
-                                                z++;
-                                            } else {
-                                                str[z] = '\0';
-                                                break;
-                                            }
-                                        }
-                                        // call of function geturls() (summary of geturls' function in its definition)
-                                        geturls(str);
-
+                                // add the path of the directory my files are in
+                                // so that when i try to open it, it won't return -1
+                                strcpy(str, "./notifyDir/");
+                                strcat(str, file);
+                                int z = 0; 
+                                while(str != "\0"){
+                                    if(str[z] != '\n'){
+                                        z++;
+                                    } else {
+                                        str[z] = '\0';
                                         break;
-
-                                        // kill(getpid(), SIGSTOP);
+                                    }
                                 }
+                                // call of function geturls() (summary of geturls' function in its definition)
+                                geturls(str);
 
-
+                                kill(getpid(), SIGSTOP);
                             }
+
+
+                        }
 
                     } else {
 
@@ -379,11 +368,15 @@ int main(void){
                     write(fifofd, &(Qitem.processid), sizeof(int));
                     close(fifofd);
 
+/* **This part of code is signal handling between the manager and the worker but is incomplete and i chose that **
+   **its a better reflection of the code without it (more details about it will be in the readme file)          **
+
                     int status;
-                    // waitpid(Qitem.processid, &status, WSTOPPED);
+                    waitpid(Qitem.processid, &status, WSTOPPED);
 
-                    // queue_push(&Q, Qitem.processid, Qitem.fifoname);
+                    queue_push(&Q, Qitem.processid, Qitem.fifoname);
 
+*/
                 }
 
             } // if read >0
