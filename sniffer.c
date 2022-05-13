@@ -374,7 +374,7 @@ int main(void){
                     int status;
                     waitpid(Qitem.processid, &status, WSTOPPED);
 
-                    queue_push(&Q, Qitem.processid, Qitem.fifoname);
+                    queue_push(-1, Qitem.fifoname);
 
 */
                 }
