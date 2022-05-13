@@ -16,7 +16,13 @@
 #include <errno.h>
 #include "queue.h"
 
+typedef struct {
+    char *url;
+    int counter;
+} urls;
 
+// a function that gets an int and adds it as text next to the string "fifo"
+// i.e. if(i=5) return value--> fifo5
 char *fifoname(int i){
     
     // a function turning fifo'i' into fifo1 etc...
@@ -59,8 +65,8 @@ char *fifoname(int i){
 
 }
 
+// a function that returns the string after the last space of a given string
 char *afterspace(char *str){
-    
 
     char *tempstr, ch;
     int i=0;
@@ -83,6 +89,129 @@ char *afterspace(char *str){
     printf("lalalala %s\n", tempstr);
 
     return ++tempstr;
+
+}
+
+// a function the opens file <filename> and gets all of its urls
+// along with the counter of how many times each shows up
+// at the end the function creates a file with the name of the original opened file
+// and .out at the end and puts all of the urls, with how many they appeared in the file, to it
+void geturls(char *filename){
+
+	int i = 0, fd, b, flag;
+	char *str, *ch;
+	ch = (char *) malloc(sizeof(char));
+	// char *arr[1000];
+    urls arr[1000];
+
+    for(int a=0 ; a<1000 ; a++){
+        arr[a].counter = 0;
+    }
+
+	fd = open(filename, O_RDONLY);
+    if(fd == -1) printf("get urls: opening file failed\n");
+
+    // finding urls and storing them into an array of a struct
+    // with one member of the the url and one with how many times it was found in the file
+	while(1) {
+		if(read(fd, ch, sizeof(char)) > 0) {
+			str = (char *) malloc(100*sizeof(char));
+			if(ch[0] == 'h'){
+				strcat(str, ch);
+				if(read(fd, ch, sizeof(char)) > 0) {
+					if(ch[0] == 't') {
+						strcat(str, ch);
+						if(read(fd, ch, sizeof(char)) > 0){
+							if(ch[0] == 't') {
+								strcat(str, ch);
+								if(read(fd, ch, sizeof(char)) > 0) {
+									if(ch[0] == 'p') {
+										strcat(str, ch);
+										if(read(fd, ch, sizeof(char)) > 0) {
+											while(ch[0] != ' ' && ch[0] != '\n'){
+												strcat(str, ch);
+												read(fd, ch, sizeof(char));
+											}
+                                            flag = 1;
+                                            b = 0;
+                                            while(arr[b].url != NULL) {
+                                                if(!strcmp(arr[b].url, str)) {
+                                                    flag = 0;
+                                                    break;
+                                                }
+                                                b++;
+                                            }
+                                            if(flag) {
+                                                arr[i].url = str;
+                                                arr[i].counter++;
+                                                i++;
+                                            } else {
+                                                arr[b].counter++;
+                                            }
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} else break;
+	}
+	printf("\n");
+	close(fd);
+	free(str);
+    free(ch);
+    
+	int j = 0;
+	i = 0;
+	char *temp;
+
+    // getting the location part of the url
+	while(arr[i].url != NULL) {
+
+		temp = (char *) malloc(200*sizeof(char));
+
+		strcpy(temp, arr[i].url);
+        temp = strchr(arr[i].url, '/');
+        temp += 2;
+
+        if(temp[0] == 'w'){
+            temp += 4;
+        }
+
+        j = 0;
+        while(temp[j] != '/') {
+            j++;
+        }
+
+        temp[j] = '\0';
+        arr[i].url = temp;
+
+        i++;
+	}
+
+    i = -1;
+	while(arr[i+1].url != NULL) {
+        printf("%s %d\n", arr[i+1].url, arr[i+1].counter);
+        i++;
+    }
+    if(i == -1) printf("no urls found\n");
+
+
+    filename += strlen("./kaka/");
+    strcat(filename, ".out");
+    printf("%s\n", filename);
+
+    fd = open(filename, O_WRONLY | O_CREAT);
+    i = 0;
+    while(arr[i].url != NULL) {
+     
+        write(fd, arr[i].url, sizeof(arr[i].url));
+        write(fd, " ", sizeof(char));
+        write(fd, &(arr[i].counter), sizeof(int));
+        write(fd, "\n", sizeof(char));
+    }
 
 }
 
@@ -129,14 +258,14 @@ int main(void){
 
                 if(id2 > 0) {
                     FileName = strrchr(buffer, ch);
-                    printf("file name to be opened by worker--->%s", ++FileName);
+                    FileName++;
                 }
 
                 // if the Q is empty and we are on the parent process (still the manager)
                 // then create a new worker and push him into the Q
                 if (queue_isempty(Q) && id2 >0) {
-                    // create a new worker since no worker is available to work 
-                        
+
+                    // create a new worker since all other workers are busy
                     char *newfifo;
                     newfifo = fifoname(++j);
                     mkfifo(newfifo, 0777);
@@ -147,6 +276,8 @@ int main(void){
                         exit(EXIT_FAILURE);
                     } else if(id2 == 0) {
 
+                        // open fifo and put workers pid inside so the manager can push it into the queue
+                        // with the available workers...
                         int tempid = getpid();
                         fifofd = open(newfifo, O_WRONLY);
 
@@ -155,6 +286,9 @@ int main(void){
                         write(fifofd, &tempid, sizeof(int));
                         close(fifofd);
 
+
+                            // open fifo and check if the id of the process the manager wanted to open
+                            // is this one also read the name of the file that has to be opened
                             char *file;
                             file = (char *) malloc(n*sizeof(char));
 
@@ -166,12 +300,16 @@ int main(void){
                         
                             if(Qitem.processid == getpid()) {
 
+                                char *str;
+                                str = (char *) malloc(n*sizeof(char));
+
                                 // check if the worker we popped from the queue is the process we are currently on
                                 while(1) {
 
-                                        // open the FileName and find Links...
-                                        char *str;
-                                        str = (char *) malloc(n*sizeof(char));
+                                        // add the path of the directory my files are in
+                                        // so that when i try to open it, it won't return -1
+                                        // char *str;
+                                        // str = (char *) malloc(n*sizeof(char));
                                         strcpy(str, "./kaka/");
                                         strcat(str, file);
                                         int z = 0; 
@@ -183,11 +321,12 @@ int main(void){
                                                 break;
                                             }
                                         }
-                                        int filefd = open(str, O_RDONLY);
-                                        if(filefd == -1) printf("opening file failed\n");
-                                        // Find the URLs from the file... and delete break;
+                                        // call of function geturls() (summary of geturls' function in its definition)
+                                        geturls(str);
+
                                         break;
-                                        
+
+                                        // kill(getpid(), SIGSTOP);
                                 }
 
 
@@ -207,15 +346,23 @@ int main(void){
                 }
 
                 //  Pop the first available worker from Q and send him the FileName for him to do its thing
-                Qitem = queue_pop(&Q);          
+                Qitem = queue_pop(&Q);
+                kill(Qitem.processid, SIGCONT);
 
                 if(id2 > 0) {
 
+                    // open the fifo corresponding to the process that was popped from the queue
+                    // and write filename to be opened inside and the id of the worker that will work...
                     fifofd = open(Qitem.fifoname, O_WRONLY);
                     if(fifofd == -1) printf("opening fifo failed\n");
                     write(fifofd, FileName, n*sizeof(char));
                     write(fifofd, &(Qitem.processid), sizeof(int));
                     close(fifofd);
+
+                    int status;
+                    // waitpid(Qitem.processid, &status, WSTOPPED);
+
+                    // queue_push(&Q, Qitem.processid, Qitem.fifoname);
 
                 }
 
