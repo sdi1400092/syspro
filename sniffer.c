@@ -95,33 +95,6 @@ char *chartoint(int i) {
 
 }
 
-// a function that returns the string after the last space of a given string
-char *afterspace(char *str){
-
-    char *tempstr, ch;
-    int i=0;
-    tempstr = (char *) malloc(sizeof(str));
-
-    printf("%s\n", str);
-
-    while (str != "\0"){
-
-        if(isspace(str[i]) == 0){
-            str++;
-        } else {
-            tempstr = str;
-            str++;
-            printf("1\n");
-        }
-    }
-    printf("end of while\n");
-
-    printf("lalalala %s\n", tempstr);
-
-    return ++tempstr;
-
-}
-
 // a function the opens file <filename> and gets all of its urls
 // along with the counter of how many times each shows up
 // at the end the function creates a file with the name of the original opened file
@@ -131,7 +104,6 @@ void geturls(char *filename){
 	int i = 0, fd, b, flag;
 	char *str, *ch;
 	ch = (char *) malloc(sizeof(char));
-	// char *arr[1000];
     urls arr[1000];
 
     for(int a=0 ; a<1000 ; a++){
@@ -188,7 +160,7 @@ void geturls(char *filename){
 			}
 		} else break;
 	}
-	printf("\n");
+
 	close(fd);
 	free(str);
     free(ch);
@@ -250,6 +222,8 @@ void geturls(char *filename){
         i++;
 
     }
+
+    close(fd);
 
     char *ar[] = {
         "chmod",
