@@ -9,4 +9,4 @@ queueimplementation.o: queue.h
 	gcc -c queueimplementation.c
 
 clean:
-	rm fifo*
+	rm -f fifo* *.out

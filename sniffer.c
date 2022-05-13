@@ -191,17 +191,16 @@ void geturls(char *filename){
         i++;
 	}
 
-    i = -1;
-	while(arr[i+1].url != NULL) {
-        printf("%s %d\n", arr[i+1].url, arr[i+1].counter);
-        i++;
-    }
-    if(i == -1) printf("no urls found\n");
+    // i = -1;
+	// while(arr[i+1].url != NULL) {
+    //     printf("%s %d\n", arr[i+1].url, arr[i+1].counter);
+    //     i++;
+    // }
+    // if(i == -1) printf("no urls found\n");
 
 
     filename += strlen("./kaka/");
     strcat(filename, ".out");
-    printf("%s\n", filename);
 
     fd = open(filename, O_WRONLY | O_CREAT);
     i = 0;
@@ -211,6 +210,8 @@ void geturls(char *filename){
         write(fd, " ", sizeof(char));
         write(fd, &(arr[i].counter), sizeof(int));
         write(fd, "\n", sizeof(char));
+        i++;
+        
     }
 
 }

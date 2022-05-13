@@ -1,8 +1,6 @@
-make --dry-run --always-make --keep-going --print-directory
+make --dry-run --keep-going --print-directory
 make: Entering directory '/home/antonis/Desktop/syspro1'
-gcc -c sniffer.c
-gcc -c queueimplementation.c
-rm fifo*
+rm -f fifo* *.out
 gcc -o sniffer sniffer.o queueimplementation.o
 make: Leaving directory '/home/antonis/Desktop/syspro1'
  
