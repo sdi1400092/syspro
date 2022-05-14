@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Fri May 13 20:45:38 2022
+# Make data base, printed on Sat May 14 12:10:42 2022
 
 # Variables
 
@@ -25,7 +25,7 @@ SNAP_INSTANCE_KEY =
 # environment
 GJS_DEBUG_OUTPUT = stderr
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-ec2575c7-cbc4-4063-9e60-e9c8fdc653ec.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-d0b9c994-cdc4-4ce5-98f7-06e0230fbb5e.sock
 # environment
 LC_NAME = el_GR.UTF-8
 # environment
@@ -65,7 +65,7 @@ VSCODE_CODE_CACHE_PATH = /home/antonis/.config/Code/CachedData/da15b6fd3ef856477
 # environment
 LANG = C
 # environment
-XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.5Y3SL1
+XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.6GWSL1
 # default
 .LOADED := 
 # default
@@ -105,7 +105,7 @@ SNAP_REEXEC =
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 59606
+VSCODE_PID = 4385
 # environment
 XDG_SESSION_TYPE = wayland
 # automatic
@@ -113,7 +113,7 @@ XDG_SESSION_TYPE = wayland
 # environment
 BAMF_DESKTOP_FILE_HINT = /var/lib/snapd/desktop/applications/code_code.desktop
 # environment
-SESSION_MANAGER = local/Antonis:@/tmp/.ICE-unix/1246,unix/Antonis:/tmp/.ICE-unix/1246
+SESSION_MANAGER = local/Antonis:@/tmp/.ICE-unix/1250,unix/Antonis:/tmp/.ICE-unix/1250
 # automatic
 *F = $(notdir $*)
 # environment
@@ -161,7 +161,7 @@ LC_TIME = el_GR.UTF-8
 # environment
 SNAP = /snap/code/96
 # environment
-INVOCATION_ID = 03866a76e603445ebb2e8fcad18603ac
+INVOCATION_ID = b72d71ce648442afae83f409c6d9cc6b
 # environment
 SNAP_REVISION = 96
 # environment
@@ -199,7 +199,7 @@ SNAP_ARCH = amd64
 # makefile
 .DEFAULT_GOAL := sniffer
 # environment
-SYSTEMD_EXEC_PID = 1268
+SYSTEMD_EXEC_PID = 1272
 # environment
 DISPLAY = :0
 # environment
@@ -215,11 +215,11 @@ SNAP_DATA = /var/snap/code/96
 # environment
 SNAP_CONTEXT = wQmORiqajCDwtCKiZOMqKhIwYjONkIibLl0M6tzV86WE3Jn-YLMI
 # environment
-MANAGERPID = 1103
+MANAGERPID = 1107
 # environment
 LC_MEASUREMENT = el_GR.UTF-8
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 59564
+GIO_LAUNCHED_DESKTOP_FILE_PID = 4341
 # environment
 _ = /snap/code/96/usr/share/code/code
 # environment
@@ -229,7 +229,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 GDK_PIXBUF_MODULE_FILE = /home/antonis/snap/code/common/.cache/gdk-pixbuf-loaders.cache
 # environment
-JOURNAL_STREAM = 8:28214
+JOURNAL_STREAM = 8:29709
 # environment
 XDG_SESSION_CLASS = user
 # environment
@@ -284,9 +284,9 @@ SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd
 
 # Directories
 
-# . (device 2066, inode 17041630): 12 files, no impossibilities.
+# . (device 2066, inode 17041630): 13 files, no impossibilities.
 
-# 12 files, no impossibilities in 1 directories.
+# 13 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -362,12 +362,12 @@ sniffer.c:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 18 / storage = 178 B / avg = 9 B
-# current buf: size = 8162 B / used = 178 B / count = 18 / avg = 9 B
+# strcache buffers: 1 (0) / strings = 19 / storage = 189 B / avg = 9 B
+# current buf: size = 8162 B / used = 189 B / count = 19 / avg = 9 B
 
-# strcache performance: lookups = 35 / hit rate = 48%
+# strcache performance: lookups = 36 / hit rate = 47%
 # hash-table stats:
-# Load=18/8192=0%, Rehash=0, Collisions=0/35=0%
-# Finished Make data base on Fri May 13 20:45:38 2022
+# Load=19/8192=0%, Rehash=0, Collisions=0/36=0%
+# Finished Make data base on Sat May 14 12:10:42 2022
 
  

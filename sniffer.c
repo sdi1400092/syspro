@@ -16,6 +16,11 @@
 #include <errno.h>
 #include "queue.h"
 
+void signal_handler(int foo) {
+    printf("programm terminated by user\n");
+    kill(0, SIGKILL);
+}
+
 typedef struct {
     char *url;
     int counter;
@@ -228,7 +233,6 @@ void geturls(char *filename){
 }
 
 int main(void){
-
     
     int fd[2], id;
     if (pipe(fd) == -1) {
@@ -244,6 +248,8 @@ int main(void){
 
     if (id > 0){
         // manager
+
+        signal(SIGINT, signal_handler);
 
         close(fd[1]);
 
